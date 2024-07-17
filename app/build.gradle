@@ -1,0 +1,38 @@
+plugins {
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
+    implementation 'org.ow2.asm:asm:9.2'
+    implementation 'org.ow2.asm:asm-util:9.2'
+    implementation 'org.ow2.asm:asm-tree:9.2'
+    implementation 'com.google.guava:guava:31.1-jre'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+application {
+    mainClassName = 'asm001.App' // This is deprecated but used to avoid final property issue
+}
+
+task runWithMainClass(type: JavaExec) {
+    if (project.hasProperty('mainClass')) {
+        main = project.property('mainClass').toString()
+    } else {
+        main = 'asm001.App'
+    }
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
