@@ -21,14 +21,14 @@ java {
 }
 
 application {
-    mainClassName = 'asm001.App' // This is deprecated but used to avoid final property issue
+    mainClassName = 'asm001.ModifyApp' // This is deprecated but used to avoid final property issue
 }
 
 task runWithMainClass(type: JavaExec) {
     if (project.hasProperty('mainClass')) {
         main = project.property('mainClass').toString()
     } else {
-        main = 'asm001.App'
+        main = 'asm001.ModifyApp'
     }
     classpath = sourceSets.main.runtimeClasspath
 }

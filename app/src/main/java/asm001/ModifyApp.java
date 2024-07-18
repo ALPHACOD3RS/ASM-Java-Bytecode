@@ -2,63 +2,82 @@ package asm001;
 
 import org.objectweb.asm.*;
 
-import java.io.FileOutputStream;
+// import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
+// import java.lang.invoke.MethodHandles;
 
 public class ModifyApp {
 
     public static void main(String[] args) throws IOException {
-        System.out.println("Starting to modify App.class...");
+
+        // String classPath  = "/home/alpha/Documents/projects/project-x/asm001/app/src/main/java/asm001/App.class";
+
+        // ok now lets create a class reader to read the class byte code tho siuuuuuuucondition
 
         try {
-            // Read the App class
-            System.out.println("Reading the App class...");
             ClassReader classReader = new ClassReader("asm001/App");
-            ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 
-            ClassVisitor classVisitor = new ClassVisitor(Opcodes.ASM9, classWriter) {
+            System.out.println(classReader);
+    
+            classReader.accept(new ClassVisitor(Opcodes.ASM9) {
                 @Override
-                public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-                    MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
-                    if (name.equals("getGreeting")) {
-                        System.out.println("Found getGreeting method. Modifying...");
-                        return new MethodVisitor(Opcodes.ASM9, mv) {
-                            @Override
-                            public void visitCode() {
-                                super.visitCode();
-                                System.out.println("Inserting new instruction in getGreeting method...");
-                                mv.visitLdcInsn("Modified Hello World!");
-                                mv.visitInsn(Opcodes.ARETURN);
-                            }
-                        };
+    
+                public void visit(int version,int access, String name, String signature, String superName, String[] interfaces){
+                    System.out.println("class : " + name);
+                    System.out.println("super clas : " + superName);
+    
+                    if (interfaces != null && interfaces.length > 0) {
+                        System.out.println("interfaces");
+                        for (String i : interfaces){
+    
+                            System.out.println(i + " ");
+                        }
+                        System.out.println();
                     }
-                    return mv;
+                    System.out.println("Access : " + access);
+                    System.out.println("version : " + version );
+                    System.out.println("signature : " + signature)
+                    ;
+                    
                 }
-            };
-
-            classReader.accept(classVisitor, 0);
-            byte[] modifiedClass = classWriter.toByteArray();
-
-            // Define a new class with the modified bytecode
-            Class<?> modifiedAppClass = MethodHandles.lookup().defineClass(modifiedClass);
-
-            // Test the modified class
-            System.out.println("Testing the modified class...");
-            Object modifiedAppInstance = modifiedAppClass.getDeclaredConstructor().newInstance();
-            String result = (String) modifiedAppClass.getMethod("getGreeting").invoke(modifiedAppInstance);
-            System.out.println(result);
-
-            // Write the modified class to a file
-            String outputPath = "build/classes/java/main/asm001/App.class";
-            System.out.println("Writing modified App.class to " + outputPath);
-            try (FileOutputStream fos = new FileOutputStream(outputPath)) {
-                fos.write(modifiedClass);
-                System.out.println("App.class modified successfully and written to " + outputPath);
-            }
+    
+                @Override
+                public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value){
+    
+                    System.out.println("field " + name  + "  " + descriptor);
+                    System.out.println("access " + access);
+                    System.out.println("value " + value);
+    
+                    return super.visitField(access, name, descriptor, signature, value);
+                }
+    
+                @Override
+                public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions){
+                    System.out.println("field " + name  + "  " + descriptor);
+                    System.out.println("access " + access);
+                    System.out.println("value " + signature);
+    
+                    if (exceptions != null && exceptions.length > 0) {
+                        System.out.println("exeptions : ");
+                        for (String e : exceptions){
+                            System.out.println(e +  "  ");
+                        }
+                        System.out.println();
+                    }
+                    return visitMethod(access, name, descriptor, signature, exceptions);
+    
+    
+            }}, 
+            0);
+            
         } catch (Exception e) {
             System.out.println("An error occurred while modifying the App class: " + e.getMessage());
             e.printStackTrace();
         }
+
+       
+        
+
+      
     }
 }

@@ -4,11 +4,16 @@
 package asm001;
 
 public class App {
-    public String getGreeting() {
-        return "Hello World!";
+
+    private String message;
+    public void getGreeting() {
+         this.message = "Hello World!";
     }
 
+    public void hello() {
+        System.out.println(this.message);
+    }
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        System.out.println("message");
     }
 }
